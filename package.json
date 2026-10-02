@@ -21,9 +21,5 @@
   },
   "engines": {
     "node": ">=20.0.0"
-  },
-  "overrides": {
-    "@types/express": "4.17.25",
-    "@types/express-serve-static-core": "4.19.9"
   }
 }
