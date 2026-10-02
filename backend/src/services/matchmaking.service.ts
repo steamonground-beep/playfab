@@ -58,7 +58,7 @@ async function tryFormMatch(queueName: string): Promise<void> {
 
     const tickets = ticketResult.rows;
     const matchId = generatePublicId();
-    const playerIds = tickets.map(t => t.player_id);
+    const playerIds = tickets.map((t: { player_id: string }) => t.player_id);
     const photonRoomName = `match_${matchId}`;
     await client.query(
       `INSERT INTO matches (match_id, queue_name, game_mode, region, player_ids, photon_room_name, status)

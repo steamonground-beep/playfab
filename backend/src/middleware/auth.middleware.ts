@@ -8,6 +8,9 @@ import { queryOne } from '../lib/db';
 export interface AuthenticatedRequest extends Request {
   player?: { id: string; publicId: string };
   admin?: { id: string; username: string; role: string };
+  body: any;
+  query: any;
+  params: any;
 }
 
 export async function requireAuth(req: AuthenticatedRequest, _res: Response, next: NextFunction): Promise<void> {

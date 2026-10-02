@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import * as inventoryService from '../services/inventory.service';
 import * as currencyService from '../services/currency.service';

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { requireGameServer } from '../middleware/game-server.middleware';
 import { validate } from '../middleware/validate.middleware';
@@ -17,7 +17,7 @@ const updateStatsSchema = z.object({
   }).refine((stat) => stat.value !== undefined || stat.increment !== undefined)),
 }).refine((body) => body.statistics.length > 0 && body.statistics.length <= 100);
 
-router.put('/players/:publicId/statistics', validate(updateStatsSchema), async (req, res, next) => {
+router.put('/players/:publicId/statistics', validate(updateStatsSchema), async (req, res: Response, next: NextFunction) => {
   try {
     const idempotencyKey = req.header('idempotency-key');
     if (!idempotencyKey || idempotencyKey.length < 16 || idempotencyKey.length > 128) {

@@ -1,10 +1,10 @@
-import { Router } from 'express';
+import { Router, Response, NextFunction } from 'express';
 import * as photonService from '../services/photon.service';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth.middleware';
 
 const router = Router();
 
-router.get('/realtime/auth', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+router.get('/realtime/auth', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const authData = await photonService.getPhotonRealtimeAuthenticationData(req.player!.id, req.player!.publicId);
     res.json({ success: true, data: authData });
@@ -13,7 +13,7 @@ router.get('/realtime/auth', requireAuth, async (req: AuthenticatedRequest, res,
   }
 });
 
-router.get('/voice/auth', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+router.get('/voice/auth', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const authData = await photonService.getPhotonVoiceAuthenticationData(req.player!.id, req.player!.publicId);
     res.json({ success: true, data: authData });
@@ -22,7 +22,7 @@ router.get('/voice/auth', requireAuth, async (req: AuthenticatedRequest, res, ne
   }
 });
 
-router.post('/validate', async (req, res, next) => {
+router.post('/validate', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const { userId, authToken, serviceType } = req.body;
     const valid = await photonService.validatePhotonAuth(userId, authToken, serviceType);

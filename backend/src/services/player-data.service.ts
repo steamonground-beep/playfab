@@ -74,7 +74,7 @@ export async function updatePlayerData(
       }
 
       const valueStr = JSON.stringify(data.value);
-      if (valueStr === undefined || Buffer.byteLength(valueStr, 'utf8') > MAX_DATA_SIZE) {
+      if (valueStr === undefined || Buffer.from(valueStr).byteLength > MAX_DATA_SIZE) {
         errors[key] = 'Data too large';
         continue;
       }

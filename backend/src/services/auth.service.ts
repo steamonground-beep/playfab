@@ -123,7 +123,7 @@ export async function loginRayvoCustomIDNoPCVR(
     let player = await client.query<PlayerRow>(
       `SELECT * FROM players WHERE custom_id = $1 AND deleted_at IS NULL AND is_active = true`,
       [customId]
-    ).then(r => r.rows[0]);
+    ).then((r: { rows: PlayerRow[] }) => r.rows[0]);
 
     if (!player) {
       if (!createAccount) {

@@ -1,10 +1,10 @@
-import { Router } from 'express';
+import { Router, Response, NextFunction } from 'express';
 import * as leaderboardService from '../services/leaderboard.service';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth.middleware';
 
 const router = Router();
 
-router.get('/:leaderboardId', async (req, res, next) => {
+router.get('/:leaderboardId', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const limit = parseInt(req.query.limit as string ?? '100', 10);
     const offset = parseInt(req.query.offset as string ?? '0', 10);
@@ -16,7 +16,7 @@ router.get('/:leaderboardId', async (req, res, next) => {
   }
 });
 
-router.get('/:leaderboardId/position', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+router.get('/:leaderboardId/position', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const seasonId = req.query.seasonId as string | undefined;
     const position = await leaderboardService.getPlayerLeaderboardPosition(req.player!.id, req.params.leaderboardId, seasonId);

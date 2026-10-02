@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import * as playerDataService from '../services/player-data.service';
 import * as statisticsService from '../services/statistics.service';
@@ -9,7 +9,7 @@ import { NotFoundError } from '../lib/errors';
 
 const router = Router();
 
-router.get('/profile', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+router.get('/profile', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const profile = await playerDataService.getPlayerProfile(req.player!.id);
     res.json({ success: true, data: profile });
@@ -18,7 +18,7 @@ router.get('/profile', requireAuth, async (req: AuthenticatedRequest, res, next)
   }
 });
 
-router.get('/profile/:publicId', optionalAuth, async (req: AuthenticatedRequest, res, next) => {
+router.get('/profile/:publicId', optionalAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const player = await getPlayerByPublicId(req.params.publicId);
     if (!player) throw new NotFoundError('Player not found');
@@ -29,7 +29,7 @@ router.get('/profile/:publicId', optionalAuth, async (req: AuthenticatedRequest,
   }
 });
 
-router.patch('/profile', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+router.patch('/profile', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const profile = await playerDataService.updatePlayerProfile(req.player!.id, req.body);
     res.json({ success: true, data: profile });
@@ -38,7 +38,7 @@ router.patch('/profile', requireAuth, async (req: AuthenticatedRequest, res, nex
   }
 });
 
-router.get('/data', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+router.get('/data', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const keys = req.query.keys ? (req.query.keys as string).split(',') : undefined;
     const data = await playerDataService.getPlayerData(req.player!.id, keys);
@@ -48,7 +48,7 @@ router.get('/data', requireAuth, async (req: AuthenticatedRequest, res, next) =>
   }
 });
 
-router.get('/data/:publicId', optionalAuth, async (req: AuthenticatedRequest, res, next) => {
+router.get('/data/:publicId', optionalAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const player = await getPlayerByPublicId(req.params.publicId);
     if (!player) throw new NotFoundError('Player not found');
@@ -68,7 +68,7 @@ const updateDataSchema = z.object({
   expectedVersions: z.record(z.number()).optional(),
 });
 
-router.put('/data', requireAuth, validate(updateDataSchema), async (req: AuthenticatedRequest, res, next) => {
+router.put('/data', requireAuth, validate(updateDataSchema), async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const result = await playerDataService.updatePlayerData(req.player!.id, req.body.data, req.body.expectedVersions);
     res.json({ success: true, data: result });
@@ -77,7 +77,7 @@ router.put('/data', requireAuth, validate(updateDataSchema), async (req: Authent
   }
 });
 
-router.delete('/data', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+router.delete('/data', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const keys = req.body.keys as string[];
     const deleted = await playerDataService.deletePlayerData(req.player!.id, keys);
@@ -87,7 +87,7 @@ router.delete('/data', requireAuth, async (req: AuthenticatedRequest, res, next)
   }
 });
 
-router.get('/statistics', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+router.get('/statistics', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const statKeys = req.query.statKeys ? (req.query.statKeys as string).split(',') : undefined;
     const stats = await statisticsService.getPlayerStatistics(req.player!.id, statKeys);
@@ -105,7 +105,7 @@ const updateStatsSchema = z.object({
   })),
 });
 
-router.put('/statistics', requireAuth, validate(updateStatsSchema), async (req: AuthenticatedRequest, res, next) => {
+router.put('/statistics', requireAuth, validate(updateStatsSchema), async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const stats = await statisticsService.updatePlayerStatistics(req.player!.id, req.body.statistics);
     res.json({ success: true, data: stats });
