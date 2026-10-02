@@ -1,0 +1,25 @@
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package.json package-lock.json* ./
+COPY backend/package.json ./backend/
+COPY admin-dashboard/package.json ./admin-dashboard/
+COPY worker/package.json ./worker/
+RUN npm ci --workspace=backend
+COPY backend ./backend
+COPY database ./database
+COPY scripts ./scripts
+RUN npm run build --workspace=backend
+
+FROM node:20-alpine
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package.json package-lock.json* ./
+COPY backend/package.json ./backend/
+COPY admin-dashboard/package.json ./admin-dashboard/
+COPY worker/package.json ./worker/
+RUN npm ci --workspace=backend --omit=dev
+COPY --from=builder /app/backend/dist ./backend/dist
+COPY database ./database
+COPY scripts ./scripts
+EXPOSE 3000
+CMD ["node", "backend/dist/index.js"]

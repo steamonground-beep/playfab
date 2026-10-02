@@ -1,0 +1,85 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: rayvo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rayvo
+      POSTGRES_PASSWORD: rayvo_dev_password
+      POSTGRES_DB: rayvo
+    ports:
+      - "5432:5432"
+    volumes:
+      - rayvo_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rayvo -d rayvo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: rayvo-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - rayvo_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    container_name: rayvo-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - ../.env
+    environment:
+      DATABASE_URL: postgresql://rayvo:rayvo_dev_password@postgres:5432/rayvo
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.worker
+    container_name: rayvo-worker
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      DATABASE_URL: postgresql://rayvo:rayvo_dev_password@postgres:5432/rayvo
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  admin-dashboard:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.admin
+    container_name: rayvo-admin
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  rayvo_pg_data:
+  rayvo_redis_data:

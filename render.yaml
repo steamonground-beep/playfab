@@ -1,0 +1,52 @@
+services:
+  - type: web
+    name: rayvo-api
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build --workspace=backend
+    startCommand: npm run start --workspace=backend
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: TRUST_PROXY_HOPS
+        value: 1
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: API_KEY_SALT
+        generateValue: true
+      - key: PHOTON_AUTH_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        sync: false
+      - key: PHOTON_REALTIME_APP_ID
+        sync: false
+      - key: PHOTON_VOICE_APP_ID
+        sync: false
+      - key: PHOTON_REGION
+        value: us
+      - key: PHOTON_APP_VERSION
+        value: 1.0
+
+  - type: web
+    name: rayvo-admin
+    runtime: static
+    buildCommand: npm install && npm run build --workspace=admin-dashboard
+    staticPublishPath: admin-dashboard/dist
+    autoDeploy: true
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        sync: false
