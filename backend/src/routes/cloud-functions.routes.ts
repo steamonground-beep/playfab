@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import * as cloudFunctionsService from '../services/cloud-functions.service';
 import { requireAuth, requireAdmin, AuthenticatedRequest } from '../middleware/auth.middleware';
@@ -10,7 +10,7 @@ const executeFunctionSchema = z.object({
   idempotencyKey: z.string().optional(),
 });
 
-router.post('/:functionName', requireAuth, validate(executeFunctionSchema), async (req: AuthenticatedRequest, res, next) => {
+router.post('/:functionName', requireAuth, validate(executeFunctionSchema), async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const { idempotencyKey } = req.body;
     const result = await cloudFunctionsService.executeCloudFunction(
@@ -26,7 +26,7 @@ router.post('/:functionName', requireAuth, validate(executeFunctionSchema), asyn
   }
 });
 
-router.get('/', async (_req, res, next) => {
+router.get('/', async (_req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const functions = await cloudFunctionsService.listCloudFunctions();
     res.json({ success: true, data: functions });
@@ -35,7 +35,7 @@ router.get('/', async (_req, res, next) => {
   }
 });
 
-router.get('/:functionName/logs', requireAdmin, async (req: AuthenticatedRequest, res, next) => {
+router.get('/:functionName/logs', requireAdmin, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const limit = parseInt(req.query.limit as string) || 50;
     const logs = await cloudFunctionsService.getFunctionLogs(req.params.functionName, undefined, limit);
@@ -45,7 +45,7 @@ router.get('/:functionName/logs', requireAdmin, async (req: AuthenticatedRequest
   }
 });
 
-router.get('/:functionName/logs/my', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+router.get('/:functionName/logs/my', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const limit = parseInt(req.query.limit as string) || 50;
     const logs = await cloudFunctionsService.getFunctionLogs(req.params.functionName, req.player!.id, limit);

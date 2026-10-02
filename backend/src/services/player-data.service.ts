@@ -61,7 +61,7 @@ export async function updatePlayerData(
       `SELECT data_key FROM player_data WHERE player_id = $1`,
       [playerId]
     );
-    const knownKeys = new Set(existingKeys.rows.map(row => row.data_key));
+    const knownKeys = new Set(existingKeys.rows.map((row: { data_key: string }) => row.data_key));
     const newKeys = Object.keys(updates).filter(key => !knownKeys.has(key));
     if (knownKeys.size + newKeys.length > MAX_KEYS) {
       throw new ValidationError(`Maximum ${MAX_KEYS} data keys allowed`);
